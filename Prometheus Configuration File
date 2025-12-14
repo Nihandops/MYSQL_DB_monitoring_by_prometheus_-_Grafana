@@ -1,0 +1,17 @@
+Open the Prometheus service configuration file.
+sudo nano /etc/prometheus/prometheus.yml
+
+Add the Node Exporter as a target in the Prometheus service. Place the configuration at the bottom of the file.
+...
+- job_name: '<server-name>-node_exporter'
+    static_configs:
+    - targets: ["<ip-endpoint>:9100"]
+        labels:
+        hostname: <server-name>
+
+Validate the Prometheus configuration file syntax.
+sudo promtool check config /etc/prometheus/prometheus.yml
+
+Restart the Prometheus service.
+sudo systemctl restart prometheus
+sudo systemctl status prometheus
