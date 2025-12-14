@@ -1,0 +1,9 @@
+Prometheus Installation
+Below are the steps for installing and configuring the Prometheus service:
+
+Create a dedicated user for the Prometheus service.
+
+```sudo useradd \
+--system \
+--no-create-home \
+--shell /bin/false prometheus```
