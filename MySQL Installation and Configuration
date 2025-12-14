@@ -1,0 +1,131 @@
+
+## Install MySQL
+
+```bash
+sudo apt update
+sudo apt install -y mysql-server
+```
+
+---
+
+## Start & Enable MySQL
+
+```bash
+sudo systemctl start mysql
+sudo systemctl enable mysql
+sudo systemctl status mysql
+```
+
+---
+
+## Secure MySQL
+
+```bash
+sudo mysql_secure_installation
+```
+
+---
+
+## Login to MySQL
+
+```bash
+sudo mysql -u root -p
+```
+
+---
+
+## Create Grafana Database
+
+```sql
+CREATE DATABASE <grafana-db-name>;
+```
+
+---
+
+## Create Grafana User (restricted by IP)
+
+```sql
+CREATE USER '<grafana-db-user>'@'<private-ip-grafana>' 
+IDENTIFIED WITH mysql_native_password BY '<grafana-db-password>';
+```
+
+### (Optional) Fix Password Policy Error
+
+```sql
+SET GLOBAL validate_password.policy=LOW;
+```
+
+---
+
+## Grant Privileges
+
+```sql
+GRANT ALL PRIVILEGES ON <grafana-db-name>.* 
+TO '<grafana-db-user>'@'<private-ip-grafana>' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+```
+
+---
+
+## Verify Access
+
+```sql
+SELECT user, host, db FROM mysql.db;
+exit
+```
+
+---
+
+## Enable Remote MySQL Access
+
+```bash
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+```ini
+bind-address = 0.0.0.0
+```
+
+```bash
+sudo systemctl restart mysql
+```
+
+---
+
+## Allow Grafana IP in Firewall
+
+```bash
+sudo ufw allow from <private-ip-grafana> to any port 3306
+```
+
+---
+
+## Configure Grafana MySQL Connection
+
+```bash
+sudo nano /etc/grafana/grafana.ini
+```
+
+```ini
+[database]
+type = mysql
+host = <private-ip-mysql>:3306
+name = <grafana-db-name>
+user = <grafana-db-user>
+password = <grafana-db-password>
+```
+
+---
+
+## Restart Grafana
+
+```bash
+sudo systemctl restart grafana-server
+sudo systemctl status grafana-server
+```
+
+---
+
+## Done
+
+Grafana is now using MySQL as its backend database.
