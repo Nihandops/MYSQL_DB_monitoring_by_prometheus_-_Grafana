@@ -1,4 +1,6 @@
-Prometheus Installation
+This commands and steps got it from https://aifajar.medium.com/installation-and-configuration-of-prometheus-and-grafana-7d7bf82810b3
+you can follow form there or follow these steps below:
+
 Below are the steps for installing and configuring the Prometheus service:
 
 Create a dedicated user for the Prometheus service.
@@ -7,3 +9,62 @@ Create a dedicated user for the Prometheus service.
 --system \
 --no-create-home \
 --shell /bin/false prometheus```
+
+Download the Prometheus package. In this documentation example, version 2.52.0 is used.
+
+wget https://github.com/prometheus/prometheus/releases/download/v2.53.4/prometheus-2.53.4.linux-amd64.tar.gz
+
+Extract the Prometheus archive file.
+
+tar -xvf prometheus-2.53.4.linux-amd64.tar.gz
+
+Navigate into the extracted directory.
+
+cd prometheus-2.52.0.linux-amd64
+
+Create necessary directories for the Prometheus service.
+sudo mkdir -p /data /etc/prometheus
+
+Move the extracted Prometheus files into the appropriate directories.
+sudo mv prometheus promtool /usr/local/bin/
+sudo mv consoles/ console_libraries/ /etc/prometheus/
+sudo mv prometheus.yml /etc/prometheus/prometheus.yml
+
+Set ownership of Prometheus-related directories.
+sudo chown -R prometheus:prometheus /etc/prometheus/ /data/
+
+erify the Prometheus installation.
+prometheus --version
+Configure Prometheus to run as a systemd service. Create the file.
+sudo nano /etc/systemd/system/prometheus.service
+Add the following content to the newly created service file:
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/prometheus \
+--config.file=/etc/prometheus/prometheus.yml \
+--storage.tsdb.path=/data \
+--web.console.templates=/etc/prometheus/consoles \
+--web.console.libraries=/etc/prometheus/console_libraries \
+--web.listen-address=0.0.0.0:9090 \
+--web.enable-lifecycle
+
+[Install]
+WantedBy=multi-user.target
+Start and enable the Prometheus service.
+sudo systemctl start prometheus
+sudo systemctl enable prometheus
+Then, check the service status.
+sudo systemctl status prometheus
+
