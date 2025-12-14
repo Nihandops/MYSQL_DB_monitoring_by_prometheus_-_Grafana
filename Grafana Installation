@@ -1,0 +1,24 @@
+
+The following are the steps to install the Grafana service:
+
+Install the required packages.
+sudo apt-get install -y apt-transport-https software-properties-common wget
+
+Import the GPG key.
+sudo mkdir -p /etc/apt/keyrings/
+
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+
+Add the repository for the stable release version.
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+
+Install the Grafana service.
+sudo apt-get update
+sudo apt-get install grafana
+
+Enable the Grafana service.
+sudo systemctl enable grafana-server.service
+
+Then check the service status.
+
+sudo systemctl status grafana-server.service
